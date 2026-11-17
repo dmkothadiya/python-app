@@ -1,7 +1,12 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from flask import Flask, Response, jsonify
 
 
-PAGE = """<!doctype html>
+app = Flask(__name__)
+
+
+@app.route("/")
+def hello() -> str:
+    return """<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -33,36 +38,25 @@ PAGE = """<!doctype html>
   <body>
     <main>
       <h1>Hello, Backstage!</h1>
-      <p>Your demo Python application is up and running.</p>
+      <p>Your demo Flask application is up and running.</p>
     </main>
   </body>
-</html>
-"""
+</html>"""
 
 
-class HelloHandler(BaseHTTPRequestHandler):
-    def do_GET(self) -> None:
-        if self.path != "/":
-            self.send_error(404, "Page not found")
-            return
-
-        content = PAGE.encode("utf-8")
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(content)))
-        self.end_headers()
-        self.wfile.write(content)
+@app.route("/health")
+def health() -> Response:
+    return jsonify(status="ok")
 
 
-def main() -> None:
-    address = ("127.0.0.1", 8000)
-    with HTTPServer(address, HelloHandler) as server:
-        print(f"Serving the Backstage demo at http://{address[0]}:{address[1]}")
-        try:
-            server.serve_forever()
-        except KeyboardInterrupt:
-            print("\nStopping the server.")
+@app.route("/details")
+def details() -> Response:
+    return jsonify(
+        name="python-app",
+        description="Hello Backstage demo application",
+        framework="Flask",
+    )
 
 
 if __name__ == "__main__":
-    main()
+    app.run(host="127.0.0.1", port=8000)
