@@ -44,12 +44,12 @@ def hello() -> str:
 </html>"""
 
 
-@app.route("/health")
+@app.route("/api/v1/healthz")
 def health() -> Response:
-    return jsonify(status="ok")
+    return jsonify(status="ok"),  200
 
 
-@app.route("/details")
+@app.route("/api/v1/details")
 def details() -> Response:
     return jsonify(
         name="python-app",
