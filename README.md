@@ -18,6 +18,17 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. Press `Ctrl
 - `GET /api/v1/healthz` returns `{"status":"ok"}` when the app is running.
 - `GET /api/v1/details` returns the app name, description, and framework as JSON.
 
+## Build and publish with GitHub Actions
+
+The workflow in `.github/workflows/dockerhub.yml` builds the image for pull requests to `main`. On pushes to `main` and version tags such as `v1.0.0`, it also publishes the image to Docker Hub as `dmkothadiya/python-app`, with branch/tag, commit SHA, and (for `main`) `latest` tags.
+
+Add these repository secrets in **GitHub → Settings → Secrets and variables → Actions**:
+
+- `DOCKERHUB_USERNAME`: your Docker Hub username.
+- `DOCKERHUB_TOKEN`: a Docker Hub access token with permission to push to `dmkothadiya/python-app`.
+
+If your Docker Hub namespace is different, update `images` in the workflow to match it.
+
 ## Kubernetes
 
 The app Deployment, Service, and Ingress are in the `default` namespace. Build the image and make it available to your cluster:
