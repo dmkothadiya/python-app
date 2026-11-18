@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  labels:
+    app: python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+        - name: python-app
+          image: dmkothadiya/python-app:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 5000
+          readinessProbe:
+            httpGet:
+              path: /api/v1/healthz
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /api/v1/healthz
+              port: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-app
+spec:
+  selector:
+    app: python-app
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: python-app
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: python-app.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: python-app
+                port:
+                  number: 80

@@ -15,6 +15,23 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. Press `Ctrl
 
 ## API endpoints
 
-- `GET /health` returns `{"status":"ok"}` when the app is running.
-- `GET /details` returns the app name, description, and framework as JSON.
+- `GET /api/v1/healthz` returns `{"status":"ok"}` when the app is running.
+- `GET /api/v1/details` returns the app name, description, and framework as JSON.
+
+## Kubernetes
+
+The app Deployment, Service, and Ingress are in the `default` namespace. Build the image and make it available to your cluster:
+
+```powershell
+docker build -t python-app:latest -f dockerfile .
+```
+
+Install the official F5 NGINX Ingress Controller Helm chart in the `ingress` namespace, then apply the app manifests to `default`:
+
+```powershell
+helm upgrade --install nginx-ingress oci://ghcr.io/nginx/charts/nginx-ingress --version 2.8.1 --namespace ingress --create-namespace --skip-crds --set controller.enableCustomResources=false --set controller.appprotect.enable=false --set controller.appprotectdos.enable=false
+kubectl apply -n default -f k8s\app.yaml
+```
+
+The chart creates the `nginx` IngressClass. The Ingress routes `http://python-app.localhost` to the app. Helm is available from the official [Helm installation guide](https://helm.sh/docs/intro/install/); the controller chart and installation instructions are maintained by [F5 NGINX](https://docs.nginx.com/nginx-ingress-controller/install/helm/open-source/).
 python-app
